@@ -28,7 +28,7 @@
             margin: auto;
         }
         .sender-name {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: bold;
             color: #ffeb3b;
             text-shadow: 0 0 15px #ff9800, 0 0 25px #ff5722;
@@ -81,10 +81,19 @@
             border-radius: 8px;
             cursor: pointer;
             width: 90%;
+            margin-bottom: 10px;
             box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
         }
-        .btn:hover {
-            background: #1ebe5d;
+        .btn-copy {
+            background: #ff9800;
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 90%;
         }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
@@ -113,11 +122,11 @@
             <p style="margin-top:0; color:#ffeb3b;">👇 अपना नाम लिखकर दोस्तों को भेजें 👇</p>
             <input type="text" id="nameInput" placeholder="यहाँ अपना नाम लिखें...">
             <button class="btn" onclick="shareOnWhatsApp()">📲 WhatsApp पर भेजें</button>
+            <button class="btn-copy" onclick="copyLink()">📋 मैसेज और लिंक कॉपी करें</button>
         </div>
     </div>
 
     <script>
-        // 1. URL से नाम निकालना (जैसे ?name=Suresh)
         const urlParams = new URLSearchParams(window.location.search);
         const sender = urlParams.get('name');
         if (sender) {
@@ -125,21 +134,31 @@
             document.title = sender + " ने आपके लिए कुछ खास भेजा है 🎁";
         }
 
-        // 2. WhatsApp पर शेयर करने का फंक्शन
-        function shareOnWhatsApp() {
+        function getShareMessage() {
             const userName = document.getElementById('nameInput').value.trim();
             if (userName === "") {
                 alert("कृपया पहले अपना नाम लिखें!");
-                return;
+                return null;
             }
             const baseUrl = window.location.origin + window.location.pathname;
             const shareUrl = baseUrl + "?name=" + encodeURIComponent(userName);
-            const message = `*${userName}* ने आपके लिए एक खास सरप्राइज भेजा है 🎁👇\nजल्दी से नीली लाइन पर क्लिक करके देखें:\n${shareUrl}`;
-            
+            return `*${userName}* ने आपके लिए एक खास सरप्राइज भेजा है 🎁👇\nजल्दी से नीली लाइन पर क्लिक करके देखें:\n${shareUrl}`;
+        }
+
+        function shareOnWhatsApp() {
+            const message = getShareMessage();
+            if (!message) return;
             window.open("https://whatsapp.com" + encodeURIComponent(message), "_blank");
         }
 
-        // 3. पटाखे (Fireworks) चलाने का एनीमेशन कोड
+        function copyLink() {
+            const message = getShareMessage();
+            if (!message) return;
+            navigator.clipboard.writeText(message).then(() => {
+                alert("मैसेज और लिंक कॉपी हो गया है! अब WhatsApp में जाकर पेस्ट (Ctrl+V) करके भेज दें।");
+            });
+        }
+
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
