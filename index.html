@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आपके लिए एक खास संदेश भेजा है!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b001a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .container {
+            padding: 30px 15px;
+            max-width: 500px;
+            margin: auto;
+        }
+        .sender-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffeb3b;
+            text-shadow: 0 0 15px #ff9800, 0 0 25px #ff5722;
+            animation: bounce 1.5s infinite;
+        }
+        .ki-taraf-se {
+            font-size: 20px;
+            color: #00e5ff;
+            margin: 5px 0 20px 0;
+        }
+        .diwali-title {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff0000, #ffeb3b, #00ff00, #ff00de);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+        .shayari {
+            font-size: 18px;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            margin-bottom: 30px;
+        }
+        .input-box {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #ff9800;
+        }
+        input[type="text"] {
+            width: 85%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 90%;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+        .btn:hover {
+            background: #1ebe5d;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks"></canvas>
+
+    <div class="container">
+        <div class="sender-name" id="displayName">आपका दोस्त</div>
+        <div class="ki-taraf-se">की तरफ से आपको और आपके परिवार को</div>
+        
+        <div class="diwali-title">✨ शुभ दीपावली ✨<br>Happy Diwali</div>
+
+        <div class="shayari">
+            दीयों की रोशनी से झिलमिलाता आँगन हो,<br>
+            पटाखों की गूँज से आसमान रोशन हो,<br>
+            ऐसी आए झूम के यह दिवाली,<br>
+            हर तरफ खुशियों का ही मौसम हो! 🪔🎆
+        </div>
+
+        <div class="input-box">
+            <p style="margin-top:0; color:#ffeb3b;">👇 अपना नाम लिखकर दोस्तों को भेजें 👇</p>
+            <input type="text" id="nameInput" placeholder="यहाँ अपना नाम लिखें...">
+            <button class="btn" onclick="shareOnWhatsApp()">📲 WhatsApp पर भेजें</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. URL से नाम निकालना (जैसे ?name=Suresh)
+        const urlParams = new URLSearchParams(window.location.search);
+        const sender = urlParams.get('name');
+        if (sender) {
+            document.getElementById('displayName').innerText = sender;
+            document.title = sender + " ने आपके लिए कुछ खास भेजा है 🎁";
+        }
+
+        // 2. WhatsApp पर शेयर करने का फंक्शन
+        function shareOnWhatsApp() {
+            const userName = document.getElementById('nameInput').value.trim();
+            if (userName === "") {
+                alert("कृपया पहले अपना नाम लिखें!");
+                return;
+            }
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = baseUrl + "?name=" + encodeURIComponent(userName);
+            const message = `*${userName}* ने आपके लिए एक खास सरप्राइज भेजा है 🎁👇\nजल्दी से नीली लाइन पर क्लिक करके देखें:\n${shareUrl}`;
+            
+            window.open("https://whatsapp.com" + encodeURIComponent(message), "_blank");
+        }
+
+        // 3. पटाखे (Fireworks) चलाने का एनीमेशन कोड
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height / 2);
+            const colors = ['#ff0043', '#14fc56', '#1e7fff', '#e60aff', '#ffbf36', '#ffffff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            for (let i = 0; i < 40; i++) {
+                const angle = (Math.PI * 2) / 40 * i;
+                const speed = Math.random() * 4 + 1;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1,
+                    color: color
+                });
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(11, 0, 26, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.015;
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.alpha <= 0) particles.splice(index, 1);
+            });
+
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animate);
+        }
+
+        setInterval(createFirework, 900);
+        animate();
+    </script>
+</body>
+</html>
